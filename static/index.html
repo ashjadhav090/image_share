@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="https://assets-global.website-files.com/6257adef93867e50d84d30e2/6266bc493fb42d4e27bb8393_847541504914fd33810e70a0ea73177e.ico">
+    <title>Discord Image Upload</title>
+    <link
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        rel="stylesheet"
+    />
+    <style>
+        .container {
+            max-width: 400px;
+            margin-top: 50px;
+        }
+        .footer {
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .preview-img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+        }
+        .url-display {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .form-control {
+            margin-right: 5px;
+        }
+        .progress {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Discord Image Upload</h1>
+        <p class="text-center">Upload your image to Discord</p>
+        <br />
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" id="imageInput" />
+            <label class="custom-file-label" for="imageInput">Choose image</label>
+        </div>
+        <button id="uploadButton" class="btn btn-primary btn-block mt-4">
+            Upload
+        </button>
+        <div class="progress">
+            <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <img id="imagePreview" class="preview-img" hidden />
+        <div class="url-display" hidden>
+            <input type="text" class="form-control" id="imageUrl" readonly />
+            <button class="btn btn-outline-secondary btn-sm" id="copyUrlButton">
+                Copy
+            </button>
+        </div>
+        <div class="footer">
+            <p>Powered by Discord & Cloudflare.<br />Made with love by Vincent.</p>
+            <a href="https://github.com/missuo/discord-image">https://github.com/missuo/discord-image</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // File size check after selection
+            $('.custom-file-input').on('change', function () {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').addClass("selected").html(fileName);
+                var file = this.files[0];
+                if (file && file.size > 26214400) { // 25MB in bytes
+                    alert("File size should not exceed 25MB");
+                    this.value = ""; // Clear file input
+                    $(this).next('.custom-file-label').removeClass("selected").html("Choose image");
+                }
+            });
+
+            // Upload button click event
+            $('#uploadButton').click(function () {
+                var fileInput = document.getElementById('imageInput');
+                var file = fileInput.files[0];
+                if (!file) {
+                    alert("Please select a file.");
+                    return;
+                }
+                if (file.size > 26214400) { // Double check file size
+                    alert("File size exceeds 25MB. Please select a smaller file.");
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('image', file);
+
+                // Start upload progress
+                $('.progress').show();
+                $('#uploadProgress').css('width', '0%');
+
+                // Send upload request
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'http://localhost:3000/upload');
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        var percentComplete = (event.loaded / event.total) * 100;
+                        $('#uploadProgress').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+                    }
+                };
+                xhr.onload = function () {
+                    if (xhr.status == 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        $('#imagePreview').attr('src', data.url).removeAttr('hidden');
+                        $('#imageUrl').val(data.url).parent().removeAttr('hidden');
+                        $('#uploadProgress').css('width', '0%'); // Reset progress bar
+                    } else {
+                        alert('Upload failed!');
+                    }
+                };
+                xhr.send(formData);
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="https://assets-global.website-files.com/6257adef93867e50d84d30e2/6266bc493fb42d4e27bb8393_847541504914fd33810e70a0ea73177e.ico">
+    <title>Discord Image Upload</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .container {
+        max-width: 400px;
+        margin-top: 50px;
+      }
+      .footer {
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 20px;
+      }
+      .preview-img {
+        margin-top: 20px;
+        max-width: 100%;
+        height: auto;
+      }
+      .url-display {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .form-control {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">Discord Image</h1>
+      <p class="text-center">Upload your image to Discord</p>
+      <br />
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" id="imageInput" />
+        <label class="custom-file-label" for="imageInput">Choose image</label>
+      </div>
+      <button id="uploadButton" class="btn btn-primary btn-block mt-4">
+        Upload
+      </button>
+      <img id="imagePreview" class="preview-img" hidden />
+      <div class="url-display" hidden>
+        <input type="text" class="form-control" id="imageUrl" readonly />
+        <button class="btn btn-outline-secondary btn-sm" id="copyUrlButton">
+          Copy
+        </button>
+      </div>
+      <div class="footer">
+        <p>Powered by Discord & Cloudflare.<br />Made with love by Vincent.</p>
+        <a href="https://github.com/missuo/discord-image">https://github.com/missuo/discord-image</a>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 文件选择后立即检查大小
+            $('.custom-file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').addClass("selected").html(fileName);
+                var file = this.files[0];
+                if(file && file.size > 26214400) { // 25MB in bytes
+                    alert("File size should not exceed 25MB");
+                    this.value = ""; // 清除选中的文件
+                    $(this).next('.custom-file-label').removeClass("selected").html("Choose image");
+                }
+            });
+    
+            // 上传按钮点击事件
+            $('#uploadButton').click(function () {
+                var fileInput = document.getElementById('imageInput');
+                var file = fileInput.files[0];
+                if (!file) {
+                    alert("Please select a file.");
+                    return;
+                }
+                if (file.size > 26214400) { // 再次检查文件大小
+                    alert("File size exceeds 25MB. Please select a smaller file.");
+                    return;
+                }
+    
+                var formData = new FormData();
+                formData.append('image', file);
+    
+
+                fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    throw new Error('Expected JSON response but received something else.');
+                }
+            })
+            .then(data => {
+                $('#imagePreview').attr('src', data.url).removeAttr('hidden');
+                $('#imageUrl').val(data.url).parent().removeAttr('hidden');
+                $('#copyUrlButton').click(function() {
+                    navigator.clipboard.writeText(data.url).then(() => {
+                        alert('Image URL copied to clipboard!');
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+                alert(error.message);
+            });
+
+            });
+        });
+    </script>
+    
+  </body>
+</html> -->
