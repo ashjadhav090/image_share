@@ -4,40 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="https://assets-global.website-files.com/6257adef93867e50d84d30e2/6266bc493fb42d4e27bb8393_847541504914fd33810e70a0ea73177e.ico">
-    <title>Discord Image Upload</title>
+    <title>Image Upload</title>
     <link
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <style>
-      .container {
-        max-width: 400px;
-        margin-top: 50px;
-      }
-      .footer {
-        font-size: 0.8rem;
-        text-align: center;
-        margin-top: 20px;
-      }
-      .preview-img {
-        margin-top: 20px;
-        max-width: 100%;
-        height: auto;
-      }
-      .url-display {
-        display: flex;
-        align-items: center;
-        margin-top: 10px;
-      }
-      .form-control {
-        margin-right: 5px;
-      }
+    <style src= "style.css">
     </style>
   </head>
   <body>
     <div class="container">
       <h1 class="text-center">Discord Image</h1>
-      <p class="text-center">Upload your image to Discord</p>
+      <p class="text-center">Upload your image</p>
       <br />
       <div class="custom-file">
         <input type="file" class="custom-file-input" id="imageInput" />
@@ -54,72 +32,14 @@
         </button>
       </div>
       <div class="footer">
-        <p>Powered by Discord & Cloudflare.<br />Made with love by Vincent.</p>
-        <a href="https://github.com/missuo/discord-image">https://github.com/missuo/discord-image</a>
+        <p>Powered by Discord & Cloudflare.<br />Made with ME</p>
       </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Check file size immediately after selection
-            $('.custom-file-input').on('change', function() {
-                var fileName = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').addClass("selected").html(fileName);
-                var file = this.files[0];
-                if(file && file.size > 26214400) { // 25MB in bytes
-                    alert("File size should not exceed 25MB");
-                    this.value = ""; // Clear the selected file
-                    $(this).next('.custom-file-label').removeClass("selected").html("Choose image");
-                }
-            });
-    
-            // Click event for upload button
-            $('#uploadButton').click(function () {
-                var fileInput = document.getElementById('imageInput');
-                var file = fileInput.files[0];
-                if (!file) {
-                    alert("Please select a file.");
-                    return;
-                }
-                if (file.size > 26214400) { // Check file size again
-                    alert("File size exceeds 25MB. Please select a smaller file.");
-                    return;
-                }
-    
-                var formData = new FormData();
-                formData.append('image', file);
-    
-                // Initiate upload request
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    return response.json().then(json => {
-                        throw new Error(json.error || 'Network response was not ok.');
-                    });
-                })
-                .then(data => {
-                    $('#imagePreview').attr('src', data.url).removeAttr('hidden');
-                    $('#imageUrl').val(data.url).parent().removeAttr('hidden');
-                    $('#copyUrlButton').click(function() {
-                        navigator.clipboard.writeText(data.url).then(() => {
-                            alert('Image URL copied to clipboard!');
-                        });
-                    });
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
-                    alert(error.message); // Show error message from server
-                });
-            });
-        });
+    <script src= "script.js">
     </script>
   </body>
 </html>
